@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex"><title>Manage Records | Parish of the Most Holy Trinity</title><link rel="icon" href="images/logo.png"><link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"></head>
+<body class="dashboard-page">
+<header class="dashboard-header"><div class="wrap bar"><a class="brand" href="index.html"><img src="images/logo.png" alt="Parish seal"><span><b>Parish of the Most Holy Trinity</b><small>Shrine of the Glorious Cross</small></span></a><nav aria-label="Admin"><a href="dashboard.html">Dashboard</a><a class="active" href="#records">Manage records</a><a href="#" id="out">Sign out</a></nav></div></header>
+<main class="wrap dashboard-main">
+  <section class="dashboard-title"><div><h1>Manage records</h1><p>Review applications in first-come-first-served order.</p></div><strong id="record-count" class="record-count">0 records</strong></section>
+  <section id="record-list" class="records-view"><div class="record-toolbar"><label>Search<input id="record-search" type="search" placeholder="Name, contact or reference"></label><label>Application type<select id="record-type"><option value="all">All types</option><option value="wedding">Wedding</option><option value="baptism">Baptism</option><option value="confirmation">Confirmation</option><option value="funeral">Funeral Mass</option><option value="masses">Masses</option></select></label><label>Status<select id="record-status"><option value="all">All statuses</option><option value="pending">Pending</option><option value="approved">Confirmed</option><option value="rejected">Declined</option></select></label></div><div id="records" class="records-list"></div></section>
+  <section id="record-detail" class="record-detail" hidden></section>
+</main>
+<script type="module" src="admin.js"></script>
+</body>
+</html>

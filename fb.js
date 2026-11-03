@@ -1,0 +1,11 @@
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAnalytics,isSupported}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import{getFirestore}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getStorage}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import{getAuth}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+export*from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+export*from"https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+export*from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const app=initializeApp({apiKey:"AIzaSyASBs58EY0ueodazpG1EH_RH5wisP-r1l4",authDomain:"mhtponline.firebaseapp.com",projectId:"mhtponline",storageBucket:"mhtponline.firebasestorage.app",messagingSenderId:"721277092315",appId:"1:721277092315:web:d3894585a675ea4a1a67fe",measurementId:"G-T38K95ETG6"});
+isSupported().then(y=>y&&getAnalytics(app)).catch(()=>{});
+export const db=getFirestore(app),st=getStorage(app),auth=getAuth(app);
