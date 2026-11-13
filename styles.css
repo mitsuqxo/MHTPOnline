@@ -394,3 +394,43 @@ table{width:100%;border-collapse:collapse;margin-top:14px}th,td{text-align:left;
 @media(prefers-reduced-motion:reduce){.modal,.modal-backdrop,.modal-card{animation-duration:.01ms!important}}
 body.modal-open>header,body.modal-open>main,body.modal-open>footer{filter:blur(5px);transition:filter .35s ease}
 @media(max-width:760px){.adm{grid-template-columns:1fr}.side{flex-direction:row;flex-wrap:wrap}.brow,.dl{grid-template-columns:1fr}}
+.dashboard-main>.msg{margin-top:0;margin-bottom:22px}
+.msg.ok{border:1px solid #4d8664;color:#2f6b48;background:#f2faf5}
+.msg.warn{border:1px solid #b8892d;color:#6b4129;background:#fffaf0}
+.banner-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.banner-actions{display:flex;gap:8px;flex-wrap:wrap}
+.pbtn-sm{padding:7px 15px;font-size:13px}
+.header-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#gmail-setup-btn.connected{border-color:#4d8664;color:#2f6b48}
+.status-badge.confirmed{background:#e6f2eb;color:#2f6b48}
+.status-badge.declined{background:#fbe8e5;color:#9b3928}
+.status-badge.pending{background:#f5ead7;color:#8a561e}
+.notify-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.notify-pill.notify-sent{background:#edf7f1;color:#2f6b48;border-color:#b7dcc5}
+.notify-pill.notify-failed{background:#fdf0ee;color:#9b3928;border-color:#ebc0b8}
+.notify-pill.notify-not_configured{background:#fff8eb;color:#8a561e;border-color:#e8cfa0}
+.queue-badges{display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.queue-date{margin:2px 0 8px}
+.queue-review-note{margin-top:4px;font-size:13px;color:var(--muted)}
+.queue-btn{display:inline-block;text-decoration:none}
+.overview-panel{margin-bottom:18px}
+.overview-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.overview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 20px;margin:0}
+.overview-grid>div{padding-top:10px;border-top:1px dashed var(--line)}
+.overview-grid dt{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.overview-grid dd{margin:0;color:var(--ink);word-break:break-word}
+.overview-grid dd a{color:var(--brown);font-weight:700}
+.overview-wide{grid-column:1 / -1}
+.overview-notify-cell{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.overview-notify-actions{display:flex;gap:8px;flex-wrap:wrap}
+.review-panel label.checkbox-row{display:flex;align-items:center;gap:10px;max-width:none;margin:14px 0 18px;font-weight:500;color:var(--ink);cursor:pointer}
+.review-panel label.checkbox-row input[type="checkbox"]{width:auto;flex:none;margin:0;accent-color:var(--brown)}
+.review-actions{display:flex;gap:10px;flex-wrap:wrap}
+.setup-modal-card{width:min(100%,560px);text-align:left}
+.setup-modal-card h2{margin-top:0;color:var(--brown)}
+.setup-steps{margin:16px 0 0;padding-left:20px;color:var(--muted);font-size:14px;line-height:1.6}
+.setup-steps li{margin:6px 0}
+.setup-steps code{background:var(--bg);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:13px;color:var(--ink)}
+.setup-actions{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:760px){.queue-badges{justify-content:flex-start}.overview-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.pbtn.pbtn-sm{width:auto;min-height:0}}

@@ -1,48 +1,33 @@
 import * as F from "./fb.js";
+import {
+  TYPES,
+  escape,
+  timestampToDate,
+  formatDateTime,
+  code,
+  ageInDays,
+  getApplicantEmail,
+  statusInfo,
+  notificationSummary,
+  isAuthorizedAdmin
+} from "./admin-shared.js";
 
 const { auth, db } = F;
 const $ = selector => document.querySelector(selector);
-const escape = value => String(value ?? "").replace(/[&<>"]/g, character => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"
-}[character]));
-const types = {
-  wedding: "Wedding (Kasal)",
-  baptism: "Baptism (Binyag)",
-  confirmation: "Confirmation (Kumpil)",
-  funeral: "Funeral Mass (Libing)",
-  masses: "Masses (Pamisa)"
-};
-const day = 24 * 60 * 60 * 1000;
 let submissions = [];
-
-const isAuthorizedAdmin = async user => {
-  const [admins, admin] = await Promise.all([
-    F.getDoc(F.doc(db, "admins", user.uid)).catch(() => null),
-    F.getDoc(F.doc(db, "admin", user.uid)).catch(() => null)
-  ]);
-  return admins?.exists() || admin?.exists();
-};
-
-const submittedAt = submission => submission.createdAt?.toDate ? submission.createdAt.toDate() : null;
-const ageInDays = date => date ? Math.floor((Date.now() - date.getTime()) / day) : 0;
-const dateText = date => date ? date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "Date unavailable";
-const statusText = submission => {
-  const age = ageInDays(submittedAt(submission));
-  if (submission.status === "pending" && age >= 3) return `Delayed for ${age} days`;
-  return submission.status === "approved" ? "Approved" : submission.status === "rejected" ? "Rejected" : "Pending review";
-};
 
 function render() {
   const pending = submissions.filter(submission => submission.status === "pending");
-  const delayed = pending.filter(submission => ageInDays(submittedAt(submission)) >= 3);
-  $("#total-count").textContent = submissions.length;
-  $("#pending-count").textContent = pending.length;
-  $("#approved-count").textContent = submissions.filter(submission => submission.status === "approved").length;
-  $("#delayed-count").textContent = delayed.length;
+  const delayed = pending.filter(submission => ageInDays(timestampToDate(submission.createdAt)) >= 3);
   const approved = submissions.filter(submission => submission.status === "approved").length;
   const rejected = submissions.filter(submission => submission.status === "rejected").length;
   const reviewed = approved + rejected;
-  const progress = submissions.length ? Math.round(reviewed / submissions.length * 100) : 0;
+  const progress = submissions.length ? Math.round((reviewed / submissions.length) * 100) : 0;
+
+  $("#total-count").textContent = submissions.length;
+  $("#pending-count").textContent = pending.length;
+  $("#approved-count").textContent = approved;
+  $("#delayed-count").textContent = delayed.length;
   $("#progress-percent").textContent = `${progress}%`;
   $("#progress-fill").style.width = `${progress}%`;
   $("#progress-approved").textContent = approved;
@@ -50,17 +35,36 @@ function render() {
   $("#progress-pending").textContent = pending.length;
   $("#last-updated").textContent = `Updated ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
 
-  const records = submissions.slice().sort((a, b) => (submittedAt(a)?.getTime() ?? Infinity) - (submittedAt(b)?.getTime() ?? Infinity));
+  const records = submissions.slice().sort((a, b) => (
+    (timestampToDate(a.createdAt)?.getTime() ?? Infinity) -
+    (timestampToDate(b.createdAt)?.getTime() ?? Infinity)
+  ));
+
   $("#queues").innerHTML = `<section class="queue-section" aria-labelledby="applications-heading">
     <h2 id="applications-heading">All applications</h2>
     ${records.length ? `<div class="queue-list">${records.map((submission, index) => {
-      const status = statusText(submission);
-      const isDelayed = status.startsWith("Delayed");
+      const stInfo = statusInfo(submission);
+      const notify = notificationSummary(submission);
+      const email = getApplicantEmail(submission);
+      const submittedDate = timestampToDate(submission.createdAt);
+      const reviewedDate = timestampToDate(submission.reviewedAt);
+      const detailHref = `admin.html#${submission.type || "records"}/${submission.id}`;
       return `<article class="queue-item">
         <span class="queue-number">${index + 1}</span>
-        <div><div class="application-type">${escape(types[submission.type] || "Application")}</div><h3>${escape(submission.who || "Unnamed applicant")}</h3>
-        <p>Reference: ${escape(submission.id.slice(0, 8).toUpperCase())} &middot; ${escape(submission.contact || "No contact provided")}</p></div>
-        <div class="queue-meta"><span class="status-badge${isDelayed ? " delayed" : ""}">${escape(status)}</span><br>${escape(dateText(submittedAt(submission)))}<br><a class="queue-link" href="admin.html#${submission.type}/${submission.id}">Review record</a></div>
+        <div>
+          <div class="application-type">${escape(TYPES[submission.type] || "Application")}</div>
+          <h3>${escape(submission.who || "Unnamed applicant")}</h3>
+          <p>Reference: ${escape(code(submission))} &middot; ${escape(submission.contact || "No contact provided")}${email ? ` &middot; ${escape(email)}` : ""}</p>
+          ${reviewedDate ? `<p class="queue-review-note">Reviewed ${escape(formatDateTime(reviewedDate))}${submission.note ? ` &middot; Note: ${escape(submission.note)}` : ""}</p>` : ""}
+        </div>
+        <div class="queue-meta">
+          <div class="queue-badges">
+            <span class="status-badge ${stInfo.badgeClass}">${escape(stInfo.label)}</span>
+            <span class="notify-pill notify-${escape(notify.state)}">${escape(notify.badgeLabel)}</span>
+          </div>
+          <div class="queue-date">Submitted ${escape(formatDateTime(submittedDate))}</div>
+          <a class="pbtn pbtn-sm queue-btn" href="${escape(detailHref)}">Review record</a>
+        </div>
       </article>`;
     }).join("")}</div>` : `<p class="empty-queue">No applications yet.</p>`}
   </section>`;
@@ -71,7 +75,7 @@ F.onAuthStateChanged(auth, async user => {
     window.location.href = "index.html#admin-login";
     return;
   }
-  if (!await isAuthorizedAdmin(user)) {
+  if (!await isAuthorizedAdmin(db, user)) {
     await F.signOut(auth);
     window.location.href = "index.html#admin-login";
     return;
